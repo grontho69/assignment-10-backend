@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = 3000
 
@@ -34,13 +34,24 @@ const issuesCollection = db.collection('issues')
      res.send(result)
     })
 
+    app.get('/issues/:id', async (req, res) => {
+      const{ id }= req.params
+      console.log(id)
+      const result = await issuesCollection.findOne({_id:new ObjectId(id)})
+      res.send({
+        success: true,
+        result
+      })
+})
+
+
     app.post('/issues', async (req, res) => {
       const data = req.body
       console.log(data)
-      //const result = issuesCollection.insertOne()
+      const result = await issuesCollection.insertOne(data)
       res.send({
-        success: true
-        
+        success: true,
+        result
        })
 })
 
