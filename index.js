@@ -34,7 +34,15 @@ const issuesCollection = db.collection('issues')
      res.send(result)
     })
 
-
+    app.post('/issues', async (req, res) => {
+      const data = req.body
+      console.log(data)
+      //const result = issuesCollection.insertOne()
+      res.send({
+        success: true
+        
+       })
+})
 
 
     
