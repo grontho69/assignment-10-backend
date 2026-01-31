@@ -27,7 +27,12 @@ async function run() {
     await client.connect();
 
 const db = client.db('assignment-10')
-const issuesCollection = db.collection('issues')
+    const issuesCollection = db.collection('issues')
+
+
+    const contributionsCollection = db.collection('contributions');
+
+    //get issues
 
     app.get('/issues', async (req, res) => {
      const result = await issuesCollection.find().toArray()
@@ -53,7 +58,30 @@ const issuesCollection = db.collection('issues')
         success: true,
         result
        })
-})
+    })
+    
+    //get contributions
+
+      app.get("/contributions/:issueId", async (req, res) => {
+      const { issueId } = req.params;
+      const contribs = await contributionsCollection
+        .find({ issueId })
+        .toArray();
+      res.send(contribs);
+    });
+    
+    //save contribution data
+
+    app.post('/contributions', async (req, res) => {
+  const contribution = {
+    ...req.body,
+    date: new Date().toLocaleDateString(),
+    createdAt: new Date()
+  };
+
+  const result = await contributionsCollection.insertOne(contribution);
+  res.send({ ...contribution, _id: result.insertedId });
+});
 
 
     
