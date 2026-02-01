@@ -41,7 +41,7 @@ const db = client.db('assignment-10')
 
     app.get('/issues/:id', async (req, res) => {
       const{ id }= req.params
-      console.log(id)
+   
       const result = await issuesCollection.findOne({_id:new ObjectId(id)})
       res.send({
         success: true,
@@ -60,33 +60,32 @@ const db = client.db('assignment-10')
        })
     })
     
-    //get contributions
+   app.get('/contributions', async (req, res) => {
+    const { issueId } = req.query;
+    if (!issueId) return res.send([]);
 
-      app.get("/contributions/:issueId", async (req, res) => {
-      const { issueId } = req.params;
-      const contribs = await contributionsCollection
-        .find({ issueId })
-        .toArray();
-      res.send(contribs);
-    });
-    
-    //save contribution data
+    const result = await contributionsCollection
+      .find({ issueId })
+      .sort({ createdAt: -1 })
+      .toArray();
 
-    app.post('/contributions', async (req, res) => {
-  const contribution = {
+    res.send(result);
+  });
+
+app.post('/contributions', async (req, res) => {
+  const data = {
     ...req.body,
-    date: new Date().toLocaleDateString(),
+    amount: Number(req.body.amount),
     createdAt: new Date()
   };
 
-  const result = await contributionsCollection.insertOne(contribution);
-  res.send({ ...contribution, _id: result.insertedId });
+  const result = await contributionsCollection.insertOne(data);
+  res.send({ _id: result.insertedId, ...data });
 });
 
-
-    
-    
-    await client.db("admin").command({ ping: 1 });
+  
+  
+  await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
   
